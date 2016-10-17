@@ -31,8 +31,17 @@ int __attribute__((naked))naked_compute_volume(int rad)
 }
 int kmain(void)
 {
-  //__asm("mov %, %pc");
-  __asm("bl 0x90c4");
+  // Change proc to SVC (Supervisor) Mode
+  __asm("cps #19");
+  int test = 1;
+  test = test+1;
+  // Change proc to User Mode
+  __asm("cps #16");
+  test = 5;
+  // Change proc to SVC (Supervisor) Mode
+  __asm("cps #19");
+  test = 6;
+
   int radius = 5;
   //Cp radius to r2
   __asm("mov r2, %0" : : "r"(radius));
