@@ -1,5 +1,7 @@
 #include "util.h"
 #include "asm_tools.h"
+
+// Cote user space -------------------------------------
 // Fonction appel sys depuis le user space
 void sys_reboot(){
   //r0 = 1 : reboot
@@ -7,6 +9,15 @@ void sys_reboot(){
   __asm("SWI #0");
 }
 
+void sys_nop(){
+  //r0 = 2 : nop
+  __asm("mov r0, #2");
+  __asm("SWI #0");
+  return;
+}
+// -----------------------------------------------------
+
+// Cote kernel space -----------------------------------
 void do_sys_reboot(){
   const int PM_RSTC = 0x2010001c;
   const int PM_WDOG = 0x20100024;
@@ -17,15 +28,26 @@ void do_sys_reboot(){
   while(1); 
 }
 
+void do_sys_nop(){
+  return;
+}
+
 //Software Interrupt handler (kernel space)
 void swi_handler(){
+  //Save context
+  __asm("stmfd sp!, {r0-r12,lr}");
   int num_swi;
   __asm("mov %0, r0" : "=r"(num_swi));
   switch(num_swi){
     case 1:
       do_sys_reboot();  
+    case 2:
+      do_sys_nop();  
     break;
     default:
       PANIC();
   }
+  //Restore context
+  __asm("ldmfd sp!, {r0-r12,pc}^");
 }
+// -----------------------------------------------------

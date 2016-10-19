@@ -2,4 +2,5 @@
 *.o
 *.md5
 *.map
+*.swp
 barepyOS/build/kernel.list
