@@ -13,6 +13,8 @@ b *after_kmain
 b kernel_panic
 
 b *kmain
+b do_sys_reboot
+b kernel_panic
 
 source utils.gdb
 

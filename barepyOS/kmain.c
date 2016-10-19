@@ -1,3 +1,5 @@
+#include <syscall.h>
+#include <util.h>
 void dummy()
 {
   return;
@@ -31,22 +33,11 @@ int __attribute__((naked))naked_compute_volume(int rad)
 }
 int kmain(void)
 {
-  // Change proc to SVC (Supervisor) Mode
-  __asm("cps #19");
-  int test = 1;
-  test = test+1;
-  // Change proc to User Mode
-  __asm("cps #16");
-  test = 5;
-  // Change proc to SVC (Supervisor) Mode
-  __asm("cps #19");
-  test = 6;
+  //On passe en mode user
+  __asm("cps 0x10");
+  sys_reboot();
 
   int radius = 5;
-  //Cp radius to r2
-  __asm("mov r2, %0" : : "r"(radius));
-  //Cp r3 to radius
-  __asm("mov %0, r3" : "=r"(radius));
   int volume;
   dummy();
   volume = compute_volume(radius);
