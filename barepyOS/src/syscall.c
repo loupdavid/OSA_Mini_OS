@@ -33,7 +33,7 @@ void do_sys_nop(){
 }
 
 //Software Interrupt handler (kernel space)
-void swi_handler(){
+void __attribute__((naked)) swi_handler(){
   //Save context
   __asm("stmfd sp!, {r0-r12,lr}");
   int num_swi;

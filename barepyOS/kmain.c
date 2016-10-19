@@ -35,7 +35,9 @@ int kmain(void)
 {
   //On passe en mode user
   __asm("cps 0x10");
-  sys_nop();
+  while(1){
+    sys_nop();
+  }
 
   int radius = 5;
   int volume;
