@@ -26,8 +26,9 @@ void sys_settime(uint64_t date_ms){
   inutile = inutile2 + date_ms; 
 
   //Numero d'appel dans r0, argument dans r1
+  __asm("mov r1, %0" : : "r"(date_ms & 0xffffffff00000000 >> 32));
+  __asm("mov r2, %0" : : "r"(date_ms & 0x00000000ffffffff));
   __asm("mov r0, #3");
-  __asm("mov r1, %0" : : "r"(date_ms));
   __asm("SWI #0");
   return;
 }
@@ -52,7 +53,10 @@ void do_sys_nop(){
 void do_sys_settime(void *param_pointer){
   //Recupere parametre
   uint64_t date_ms=3;
-  date_ms = *(uint64_t*)param_pointer;
+  //r2 = lsb = pointer, pointer + 4 ( + 32 bits) = msb = r1
+  uint32_t lsb = *(uint32_t*)param_pointer;
+  uint32_t msb = *(uint32_t*)(param_pointer+4);
+  date_ms = (uint64_t) msb << 32 | (uint64_t) lsb;
   set_date_ms(date_ms);
 }
 
@@ -64,6 +68,7 @@ void __attribute__((naked)) swi_handler(){
   //Save parameters
   void *param_pointer;
   __asm("push {r1}");
+  __asm("push {r2}");
   __asm("mov %0, sp" : "=r"(param_pointer));
 
   int num_swi;
@@ -81,7 +86,7 @@ void __attribute__((naked)) swi_handler(){
       PANIC();
   }
   //On pop r1, sinon la restauration du contexte foire
-  __asm("pop {r1}");
+  __asm("pop {r1,r2}");
   //Restore context
   __asm("ldmfd sp!, {r0-r12,pc}^");
 }
