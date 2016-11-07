@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <syscall.h>
 #include <util.h>
 void dummy()
@@ -35,9 +36,8 @@ int kmain(void)
 {
   //On passe en mode user
   __asm("cps 0x10");
-  while(1){
-    sys_nop();
-  }
+  uint64_t test = 666;
+  sys_settime(test);
 
   int radius = 5;
   int volume;
