@@ -50,12 +50,12 @@ void do_sys_nop(){
   return;
 }
 
-void do_sys_settime(void *param_pointer){
+void do_sys_settime(uint32_t *param_pointer){
   //Recupere parametre
   uint64_t date_ms=3;
   //r2 = lsb = pointer, pointer + 4 ( + 32 bits) = msb = r1
-  uint32_t lsb = *(uint32_t*)param_pointer;
-  uint32_t msb = *(uint32_t*)(param_pointer+4);
+  uint32_t msb = param_pointer[1];
+  uint32_t lsb = param_pointer[2];
   date_ms = (uint64_t) msb << 32 | (uint64_t) lsb;
   set_date_ms(date_ms);
 }
@@ -64,11 +64,7 @@ void do_sys_settime(void *param_pointer){
 void __attribute__((naked)) swi_handler(){
   //Save context
   __asm("stmfd sp!, {r0-r12,lr}");
-
-  //Save parameters
   void *param_pointer;
-  __asm("push {r1}");
-  __asm("push {r2}");
   __asm("mov %0, sp" : "=r"(param_pointer));
 
   int num_swi;
@@ -85,8 +81,6 @@ void __attribute__((naked)) swi_handler(){
     default:
       PANIC();
   }
-  //On pop r1, sinon la restauration du contexte foire
-  __asm("pop {r1,r2}");
   //Restore context
   __asm("ldmfd sp!, {r0-r12,pc}^");
 }

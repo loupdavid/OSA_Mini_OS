@@ -36,7 +36,7 @@ int kmain(void)
 {
   //On passe en mode user
   __asm("cps 0x10");
-  uint64_t test = 0x1234ABCD;
+  uint64_t test = 0x11234ABCD;
   sys_settime(test);
 
   int radius = 5;
