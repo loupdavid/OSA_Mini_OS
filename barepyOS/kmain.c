@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <syscall.h>
+#include <sced.h>
 #include <util.h>
 void dummy()
 {
@@ -35,8 +36,12 @@ int kmain(void)
 {
   //On passe en mode user
   __asm("cps 0x10");
-  uint64_t test = sys_gettime();
-  test = test + 1;
+
+  struct pcb_s dest;
+  dest.i = 0xabcd1234;
+  sys_yieldto(&dest);
+
+  //Suite test
   int radius = 5;
   int volume;
   dummy();

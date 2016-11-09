@@ -1,6 +1,7 @@
 #include "util.h"
 #include "asm_tools.h"
 #include "hw.h"
+#include "sced.h"
 #include <stdint.h>
 
 // Cote user space -------------------------------------
@@ -37,7 +38,7 @@ uint64_t sys_gettime(){
   uint64_t res;
   uint32_t r0_lsb;
   uint32_t r1_msb;
-  //r0 = 3 : settime
+  //r0 = 4 : gettime
   __asm("mov r0, #4");
   __asm("SWI #0");
 
@@ -81,6 +82,7 @@ void do_sys_gettime(uint32_t *param_pointer){
   param_pointer[1] = (uint32_t)((0xffffffff00000000 & res) >> 32);
 }
 
+
 //Software Interrupt handler (kernel space)
 void __attribute__((naked)) swi_handler(){
   //Save context
@@ -100,6 +102,8 @@ void __attribute__((naked)) swi_handler(){
       do_sys_settime(param_pointer);
     case 4:
       do_sys_gettime(param_pointer); 
+    case 5:
+      do_sys_yieldto(param_pointer);
     break;
     default:
       PANIC();
