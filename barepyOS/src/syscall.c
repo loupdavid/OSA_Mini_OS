@@ -19,7 +19,6 @@ void sys_nop(){
 }
 
 void sys_settime(uint64_t date_ms){
-  //r0 = 3 : settime
   int inutile = 5;
   int inutile2 = 6;
   inutile = inutile + inutile2;
@@ -28,9 +27,25 @@ void sys_settime(uint64_t date_ms){
   //Numero d'appel dans r0, argument dans r1
   __asm("mov r1, %0" : : "r"(date_ms & 0xffffffff00000000 >> 32));
   __asm("mov r2, %0" : : "r"(date_ms & 0x00000000ffffffff));
+  //r0 = 3 : settime
   __asm("mov r0, #3");
   __asm("SWI #0");
   return;
+}
+
+uint64_t sys_gettime(){
+  uint64_t res;
+  uint32_t r0_lsb;
+  uint32_t r1_msb;
+  //r0 = 3 : settime
+  __asm("mov r0, #4");
+  __asm("SWI #0");
+
+  //Retour
+  __asm("mov %0, r0" : "=r"(r0_lsb));
+  __asm("mov %0, r1" : "=r"(r1_msb));
+  res = (uint64_t) r1_msb << 32 | (uint64_t) r0_lsb;
+  return res;
 }
 // -----------------------------------------------------
 
@@ -60,6 +75,12 @@ void do_sys_settime(uint32_t *param_pointer){
   set_date_ms(date_ms);
 }
 
+void do_sys_gettime(uint32_t *param_pointer){
+  uint64_t res = get_date_ms();
+  param_pointer[0] = (uint32_t)(0x00000000ffffffff & res);
+  param_pointer[1] = (uint32_t)((0xffffffff00000000 & res) >> 32);
+}
+
 //Software Interrupt handler (kernel space)
 void __attribute__((naked)) swi_handler(){
   //Save context
@@ -76,7 +97,9 @@ void __attribute__((naked)) swi_handler(){
       do_sys_nop();
     break;
     case 3:
-      do_sys_settime(param_pointer);  
+      do_sys_settime(param_pointer);
+    case 4:
+      do_sys_gettime(param_pointer); 
     break;
     default:
       PANIC();

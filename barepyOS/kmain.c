@@ -14,8 +14,7 @@ int div(int dividend, int divisor)
       result++;
       remainder -= divisor;
     }
-  return
-    result;
+  return result;
 }
 int compute_volume(int rad)
 {
@@ -36,9 +35,8 @@ int kmain(void)
 {
   //On passe en mode user
   __asm("cps 0x10");
-  uint64_t test = 0x11234ABCD;
-  sys_settime(test);
-
+  uint64_t test = sys_gettime();
+  test = test + 1;
   int radius = 5;
   int volume;
   dummy();
