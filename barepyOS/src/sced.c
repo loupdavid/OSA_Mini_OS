@@ -9,6 +9,7 @@ void sys_yieldto(struct pcb_s* dest){
   //r0 = 5 : yieldto
   __asm("mov r0, #5");
   __asm("mov r1, %0" : : "r"(dest));
+  __asm("mov r2, lr");
   __asm("SWI #0");
 }
 
@@ -19,7 +20,8 @@ void sched_init(){
 //Kernel space
 void do_sys_yieldto(uint32_t *register_pointer){
   //Le pointer vers la struc pcb est dans r1
-  struct pcb_s *dest = (struct pcb_s*) register_pointer[1]; 
+  struct pcb_s *dest = (struct pcb_s*) register_pointer[1];
+  uint32_t lr_user = (uint32_t) register_pointer[2];
 
   //Switch context
   int i;
@@ -27,7 +29,9 @@ void do_sys_yieldto(uint32_t *register_pointer){
     current_process->regs[i] = register_pointer[i];
     register_pointer[i] = dest->regs[i];
   }
-  current_process->lr = register_pointer[13];
-  register_pointer[13] = dest->lr;
+  // On sauvegarde le lr_user pour le prochain appel
+  current_process->lr_user = lr_user;
+  // On place le lr_user dans le lr_svc
+  register_pointer[13] = dest->lr_user;
   current_process = dest;
 }
