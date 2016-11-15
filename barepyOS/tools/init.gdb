@@ -16,7 +16,9 @@ b *kmain
 b do_sys_reboot
 b kernel_panic
 b do_sys_yieldto
-b sced.c:32
+b sced.c:59
+b kmain.c:13
+b kmain.c:24
 
 source utils.gdb
 
