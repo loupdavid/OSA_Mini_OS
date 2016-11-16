@@ -104,6 +104,8 @@ void __attribute__((naked)) swi_handler(){
       do_sys_gettime(param_pointer); 
     case 5:
       do_sys_yieldto(param_pointer);
+    case 6:
+      do_sys_yield(param_pointer);
     break;
     default:
       PANIC();
