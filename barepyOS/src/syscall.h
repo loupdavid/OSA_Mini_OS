@@ -1,3 +1,8 @@
+#include "util.h"
+#include "asm_tools.h"
+#include "hw.h"
+#include "sced.h"
+#include <stdint.h>
 //User space
 void sys_reboot();
 void sys_nop();

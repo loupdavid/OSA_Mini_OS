@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <syscall.h>
-#include <sced.h>
-#include <util.h>
+#include "syscall.h"
+#include "sced.h"
+#include "util.h"
 
 struct pcb_s *p1, *p2;
 

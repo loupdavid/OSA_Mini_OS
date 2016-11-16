@@ -3,6 +3,7 @@ struct pcb_s{
  uint32_t lr_user;
  uint32_t lr_svc;
  uint32_t sp_user;
+ uint32_t cpsr_user;
 };
 
 typedef int (func_t) (void);
